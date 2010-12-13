@@ -1,0 +1,9 @@
+# text-ann
+
+Tool for generating text annotation pages. Focused on producing external HITs for Mechanical Turk.
+
+## License
+
+Copyright (C) 2010 Aria Haghighi
+
+Distributed under the Eclipse Public License, the same as Clojure.
