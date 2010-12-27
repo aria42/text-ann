@@ -141,6 +141,7 @@
 		                    span.appendChild(contents);
 		                    range.insertNode(span);
 		                }
+                       $("#someTextArea").val($("#document").html());
 		                }
  
 		   }  
@@ -249,6 +250,10 @@ href="examples.html">here</a>.</p>
 <span id="previewnotice"></span>
 <h2>Document</h2> 
   <div id="document" class="document">$$DOCUMENT$$</div>
+
+Output:<br>
+    <textarea id="someTextArea" rows=20 cols=120></textarea>
+                
  
 <form action="https://www.mturk.com/mturk/externalSubmit" name="annotationResults" method="POST"> 
             <span id="validation"></span> 

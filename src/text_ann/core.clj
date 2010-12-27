@@ -13,7 +13,12 @@
       "#77FFFF"
       "#FF77FF"
       "#77FF77"
-      "#FFFF77"])
+      "#FFFF77"
+      "brown"
+      "green"
+      "orange"
+      "lime"
+      "pink"])
 
 (defn build-color-elems [cats]  
   (clj-str/join "\n"
@@ -22,7 +27,6 @@
         colors)))
 
 (defn build-context-menu-elems [cats]
-  ;; <li class="food"><a href="#food">food</a></li>  -->
   (clj-str/join
    (map
     (fn [cat]
