@@ -9,8 +9,14 @@
        "$$"))
 
 (def colors
-     ["#FF7777"
+     ["orange"
+      "#00CCFF"
+      "#33FF33"
+      "#FF6600"
+      "#00FFFF"
+      "#FFFF66"
       "#77FFFF"
+      #_"#006600"
       "#FF77FF"
       "#77FF77"
       "#FFFF77"
@@ -20,7 +26,7 @@
       "lime"
       "pink"])
 
-(defn build-color-elems [cats]  
+(defn build-color-elems [cats colors]  
   (clj-str/join "\n"
    (map (partial format ".%s {background-color: %s;}")
         cats
@@ -34,8 +40,8 @@
               cat cat cat))
     cats)))
 
-(defn build-js-elem [cats]
-  {:elems (build-color-elems cats)
+(defn build-js-elem [cats colors]
+  {:elems (build-color-elems cats colors)
    :menu (build-context-menu-elems cats)})
 
 (defn instantiate-template [m template]

@@ -40,7 +40,7 @@
 (defn extract-all-features [words]
   (for [i (range (count words))]
     (cond
-     (zero? i) [ ["<s>"]]
+     (zero? i) [["<s>"]]
      (= i (dec (count words))) [["</s>"]]
      :default (extract-features words i))))
 

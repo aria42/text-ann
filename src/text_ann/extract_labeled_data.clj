@@ -11,7 +11,8 @@
 	    [mochi.span :as span]
 	    [clojure.contrib.zip-filter :as zf]
 	    [clojure.contrib.zip-filter.xml :as zfx]
-	    [clojure.contrib.duck-streams :as ds]))
+	    [clojure.contrib.duck-streams :as ds])
+  (:import [mochi.nlp.process.tokenizer Token]))
 
 (defn compute-offset [html start]
   (let [prefix (.substring html 0 start)
@@ -36,34 +37,49 @@
   (ffirst
    (filter
     (fn [[l s t]]
-      (span/contains? [s t] (:abs-char-span tok)))
+      (and (:abs-char-span tok)
+	   (span/contains? [s t] (:abs-char-span tok))))
     labeled-spans)))
+
+(defn- pad-start-stop [sent]
+  (assoc sent
+    :toks
+    (concat [{:raw-word "<s>"}]
+	    (:toks sent)
+	    [{:raw-word "</s>"}])))
 
 (defn process-file [f out]
   (let [html (ds/slurp* f)
 	labeled-spans (compute-labeled-spans html)]
     (ds/write-lines out    
-      (for [tok (mapcat :toks (process (.replaceAll html "<.*?>" "")))
+      (for [tok  (concat
+		   [{:raw-word "<s>"}]
+		   (mapcat :toks (process (.replaceAll html "<.*?>" "")))
+		   [{:raw-word "</s>"}])
 	    :let [label (find-label tok labeled-spans)]]
 	(format "%s\t%s\t%d\t%d"
 		(:raw-word tok)
-		(or label "NONE")
-		(first (:abs-char-span tok))
-		(second (:abs-char-span tok)))))))
+		(cond
+		 label label
+		 (= (:raw-word tok) "<s>") "<s>"
+		 (= (:raw-word tok) "</s>") "</s>"
+		 :default "NONE")
+		(or (first (:abs-char-span tok)) 0)
+		(or (second (:abs-char-span tok)) 0))))))
              
 (defn -main [& args]
   (cli/with-command-line args
-    "extract_labeled_spans -- input-file-list out-dir"
+"text_ann.ExtractLabeledData -- input-file-list
+input-file-list has a single path per-line and
+takes each of those annotated files and makes a token file
+for use with text_ann.TrainModel. The default
+is to write the token file to the same directory
+as the input file with the out-ext option extension
+default is \".tok \" "
     ;;  Options        
-    [[out-dir "Output Directory"]
-     [out-ext "Extension for output files" ".raw-ann"]
+    [[out-ext "Extension for output files" ".tok"]     
     ;;  Main
      args]
     (let [[input-file-list out-dir & _] args]
-      (println input-file-list)
       (doseq [f (ds/read-lines input-file-list)]
-        (process-file f 
-          (if out-dir 
-            (-> (IOUtils/changeDir f out-dir) 
-                (IOUtils/changeExt out-ext))
-            (IOUtils/changeExt f out-ext)))))))
+        (process-file f (str f out-ext))))))
